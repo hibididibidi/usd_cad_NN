@@ -1,9 +1,15 @@
-This program pulls data from the web (mostly from Quandl), creates a training set of 39 inputs, trains a single layer Neural Netowrk, that uses binary classification to determine whether the value of the USD compared with CAD will increase (1) or decrease(0) in a specified number of days ahead.
+Introduction
+This program pulls data from the web (mostly from Quandl but also some data .csv files from statscan), creates a training set of 39 inputs, trains a single layer Neural Netowrk, that uses binary classification to determine whether the value of the USD compared with CAD will increase (1) or decrease(0) in a specified number of days ahead.
 It is a study to see how well this type of network can predict the outcome given fairly well known correlated values.
 
-Data is normalized if the mean of the input was outside of the range 0.1:10.
-many of the data values are not daily and therefore missing data is filled from previous values
+Data is normalized if the mean of the input was outside of the range -10:10 or the std was outside 0.1-10.
+Many of the data values are not daily and therefore missing data is filled from previous values.
+Each data set has different start dates and therefore the earliest date that was used was from the latest start date.
+Some monthly data (i.e. jobs report) is released on a certain day so that data had to be shifted to apply only once it had become available.  
+To give an indication of whether the exchange rate was trending up or down, the valuefrom the previous day was included as well as the 5, 10, 30 and 100 day moving averages
 
-The training set data has actual dates stripped off and each training example has no relation
+The training set data has actual dates stripped off.
+In order to avoid training the network on training examples that may be very similar (caused by filling of missing data) to the test/dev examples, only the first 90% of data is used in the training set and the latest 10% is used in the development and test sets (5% each). 
 
-
+ 
+ 

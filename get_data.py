@@ -82,18 +82,18 @@ def get_data(daysahead=20)
 	# CanEmS.index.values=CanEmS.index.values.apply(lambda x: x.replace(day=1) )
 
 	#Add
-    Currt= USDCAD
-    Currt['Plus1']=Currt['Value'].shift(periods=-daysahead) # THIS IS THE 20 DAY AHEAD PRICE
-    Currt['Minus1']=(Currt['Value'].shift(periods=1)-Currt['Value'])*100
-    # Utest['Minus5']=(Currt['Value'].shift(periods=5)-Currt['Value'])*100
-    Currt['Minus5']=(Currt['Value'].rolling(5).mean()-Currt['Value'])*100
-    Currt['Minus30']=(Currt['Value'].rolling(30).mean()-Currt['Value'])*100
-    Currt['Minus100']=(Currt['Value'].rolling(100).mean()-Currt['Value'])*100
-    Currt['Gain']=Currt['Plus1']-Currt['Value']
-    Currt['Result']=np.where(Currt['Gain']>0,1,0)
-    Currt=Currt[['Value','Minus1','Minus5','Minus30', 'Minus100','Result','Gain']]
-    Currt.columns=[['Current','Minus1','Minus5','Minus30', 'Minus100','Result','Gain']]
-    Curr=Currt.iloc[100:] 
+	Currt= USDCAD
+	Currt['Plus1']=Currt['Value'].shift(periods=-daysahead) # THIS IS THE 20 DAY AHEAD PRICE
+	Currt['Minus1']=(Currt['Value'].shift(periods=1)-Currt['Value'])*100
+	# Utest['Minus5']=(Currt['Value'].shift(periods=5)-Currt['Value'])*100
+	Currt['Minus5']=(Currt['Value'].rolling(5).mean()-Currt['Value'])*100
+	Currt['Minus30']=(Currt['Value'].rolling(30).mean()-Currt['Value'])*100
+	Currt['Minus100']=(Currt['Value'].rolling(100).mean()-Currt['Value'])*100
+	Currt['Gain']=Currt['Plus1']-Currt['Value']
+	Currt['Result']=np.where(Currt['Gain']>0,1,0)
+	Currt=Currt[['Value','Minus1','Minus5','Minus30', 'Minus100','Result','Gain']]
+	Currt.columns=[['Current','Minus1','Minus5','Minus30', 'Minus100','Result','Gain']]
+	Curr=Currt.iloc[100:] 
 
 	Oil=pd.merge(Oilspot, Oil1, how='outer', left_index=True, right_index=True,suffixes=('_spot','_C1'))
 	Oil=pd.merge(Oil, Oil4, how='outer', left_index=True, right_index=True)

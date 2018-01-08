@@ -1,7 +1,11 @@
+import quandl
+import pandas as pd
+import numpy as np
 
-def get_data(daysahead=20)
+
+def get_data(daysahead=20):
 	# import data
-	USDCAD= quandl.get("FED/RXI_N_B_CA", authtoken="mmpvRYssGGBNky867tt5")
+	# USDCAD= quandl.get("FED/RXI_N_B_CA", authtoken="mmpvRYssGGBNky867tt5")
 
 	# US overnight rates
 	EffFedRate = quandl.get("FED/RIFSPFF_N_D", authtoken="mmpvRYssGGBNky867tt5", start_date='1980-01-01')
@@ -75,25 +79,25 @@ def get_data(daysahead=20)
 	CanEm2=CanEm.shift(2)
 	CanEm2.columns=[['C1000s employed shift2','CUnemploy rate shift2']]
 	CanEmS=pd.merge(CanEm1,CanEm2, left_index=True,right_index=True)
-	CanEmS['gainrateemp']=(CanEmS['C1000s employed shift1']-CanEmS['C1000s employed shift2'])/CanEmS['C1000s employed shift2']*100
-	CanEmS['gainrateunem']=CanEmS['CUnemploy rate shift1']-CanEmS['CUnemploy rate shift2']
+	CanEmS['gainrateemp']=(CanEmS['C1000s employed shift1'].values -CanEmS['C1000s employed shift2'].values)/CanEmS['C1000s employed shift2']*100
+	CanEmS['gainrateunem']=CanEmS['CUnemploy rate shift1'].values-CanEmS['CUnemploy rate shift2'].values
 	CanEmS.index=pd.to_datetime(CanEmS.index)
 	CanEmSF=CanEmS[['CUnemploy rate shift1','CUnemploy rate shift2','gainrateemp','gainrateunem']]
 	# CanEmS.index.values=CanEmS.index.values.apply(lambda x: x.replace(day=1) )
 
 	#Add
-	Currt= USDCAD
-	Currt['Plus1']=Currt['Value'].shift(periods=-daysahead) # THIS IS THE 20 DAY AHEAD PRICE
-	Currt['Minus1']=(Currt['Value'].shift(periods=1)-Currt['Value'])*100
-	# Utest['Minus5']=(Currt['Value'].shift(periods=5)-Currt['Value'])*100
-	Currt['Minus5']=(Currt['Value'].rolling(5).mean()-Currt['Value'])*100
-	Currt['Minus30']=(Currt['Value'].rolling(30).mean()-Currt['Value'])*100
-	Currt['Minus100']=(Currt['Value'].rolling(100).mean()-Currt['Value'])*100
-	Currt['Gain']=Currt['Plus1']-Currt['Value']
-	Currt['Result']=np.where(Currt['Gain']>0,1,0)
-	Currt=Currt[['Value','Minus1','Minus5','Minus30', 'Minus100','Result','Gain']]
-	Currt.columns=[['Current','Minus1','Minus5','Minus30', 'Minus100','Result','Gain']]
-	Curr=Currt.iloc[100:] 
+	# Currt= USDCAD
+	# Currt['Plus1']=Currt['Value'].shift(periods=-daysahead) # THIS IS THE 20 DAY AHEAD PRICE
+	# Currt['Minus1']=(Currt['Value'].shift(periods=1)-Currt['Value'])*100
+	# # Utest['Minus5']=(Currt['Value'].shift(periods=5)-Currt['Value'])*100
+	# Currt['Minus5']=(Currt['Value'].rolling(5).mean()-Currt['Value'])*100
+	# Currt['Minus30']=(Currt['Value'].rolling(30).mean()-Currt['Value'])*100
+	# Currt['Minus100']=(Currt['Value'].rolling(100).mean()-Currt['Value'])*100
+	# Currt['Gain']=Currt['Plus1']-Currt['Value']
+	# Currt['Result']=np.where(Currt['Gain']>0,1,0)
+	# Currt=Currt[['Value','Minus1','Minus5','Minus30', 'Minus100','Result','Gain']]
+	# Currt.columns=[['Current','Minus1','Minus5','Minus30', 'Minus100','Result','Gain']]
+	# Curr=Currt.iloc[100:]
 
 	Oil=pd.merge(Oilspot, Oil1, how='outer', left_index=True, right_index=True,suffixes=('_spot','_C1'))
 	Oil=pd.merge(Oil, Oil4, how='outer', left_index=True, right_index=True)
@@ -134,7 +138,7 @@ def get_data(daysahead=20)
 	Bonds.dropna(inplace=True)
 	Bonds['2dif']=Bonds['Selected Government of Canada benchmark bond yields: 2 year']-Bonds['2 YR']
 	Bonds['5dif']=Bonds['Selected Government of Canada benchmark bond yields: 5 year']-Bonds['5 YR']
-	Bonds['10dif']=Bonds['Selected Government of Canada benchmark bond yields: 10 years']-Bonds['10 YR']	   
+	Bonds['10dif']=Bonds['Selected Government of Canada benchmark bond yields: 10 years']-Bonds['10 YR']
 
 	# Fed Funds target rate
 	fedfunds=pd.merge(FedUppTarRange,FedHisTarRate, how='outer', left_index=True,right_index=True)
@@ -155,7 +159,23 @@ def get_data(daysahead=20)
 	NetSp=(NetSp-NetSp.mean())/NetSp.std()
 
 	#Jobs
+	CanEmSF.columns=CanEmSF.columns.get_level_values(0)
 	Jobs=pd.merge(emp,CanEmSF,left_index=True,right_index=True,how='outer')
 	Jobs=Jobs/(Jobs.max())*5 #Arbitrary 5 to achieve std of 1--- dividing by std did not work for some reason??
-	
-	return Curr, Bonds, OilN, NetSp, FundsRates, Jobs
+
+	return Bonds, OilN, NetSp, FundsRates, Jobs
+
+def get_curr(daysahead=20):
+	Currt= quandl.get("FED/RXI_N_B_CA", authtoken="mmpvRYssGGBNky867tt5") 
+	Currt['Plus1']=Currt['Value'].shift(periods=-daysahead) # THIS IS THE 20 DAY AHEAD PRICE
+	Currt['Minus1']=(Currt['Value'].shift(periods=1)-Currt['Value'])*100
+	# Utest['Minus5']=(Currt['Value'].shift(periods=5)-Currt['Value'])*100
+	Currt['Minus5']=(Currt['Value'].rolling(5).mean()-Currt['Value'])*100
+	Currt['Minus30']=(Currt['Value'].rolling(30).mean()-Currt['Value'])*100
+	Currt['Minus100']=(Currt['Value'].rolling(100).mean()-Currt['Value'])*100
+	Currt['Gain']=Currt['Plus1']-Currt['Value']
+	Currt['Result']=np.where(Currt['Gain']>0,1,0)
+	Currt=Currt[['Value','Minus1','Minus5','Minus30', 'Minus100','Result','Gain']]
+	Currt.columns=[['Current','Minus1','Minus5','Minus30', 'Minus100','Result','Gain']]
+	Curr=Currt.iloc[100:]
+	return Curr

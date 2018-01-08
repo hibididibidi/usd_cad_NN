@@ -1,5 +1,9 @@
-def merge_all(Curr=Curr,Bonds=Bonds,OilN=OilN,NetSp=NetSp,FundsRates=FundsRates, Jobs=Jobs, curtestex=1):
+import pandas as pd
+import numpy as np
 
+def merge_all(Curr,Bonds,OilN,NetSp,FundsRates, Jobs, curtestex=1):
+    Curr.columns=Curr.columns.get_level_values(0)
+    OilN.columns=OilN.columns.get_level_values(0)
     Feedt=pd.merge(Bonds,OilN,how='outer',left_index=True,right_index=True)
     Feedt=pd.merge(Feedt,FundsRates,how='outer',left_index=True,right_index=True)
     Feedt=pd.merge(Feedt,Jobs,how='outer',left_index=True,right_index=True)
@@ -39,5 +43,3 @@ def SplitData3way(X,Y,percent_train=90):
     Ydev=np.float32(Y[:,Permutdev])
 #     print(Xtrain, Ytrain, Xtest, Ytest, Xdev)
     return Xtrain, Ytrain, Xtest, Ytest, Xdev, Ydev
-
-

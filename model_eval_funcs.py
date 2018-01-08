@@ -1,4 +1,7 @@
 #predictor
+from initit import *
+from tensor_model_funcs import *
+
 def Pred(X,parameters):
     W1 = parameters['W1']
     b1 = parameters['b1']
@@ -6,7 +9,7 @@ def Pred(X,parameters):
     b2 = parameters['b2']
 #     W3 = parameters['W3']
 #     b3 = parameters['b3']
-    
+
     Z1=tf.matmul(W1,X)+b1
     A1=tf.nn.relu(Z1)
     Z2=tf.matmul(W2,A1)+b2 #could use A1_drop
@@ -24,21 +27,18 @@ def tester_table(Feed_pred,Yhat):
     Z.columns=[['Probability','Current']]
     return Z
 
-def run_model(days)
+def run_model(Bonds,OilN,NetSp,FundsRates, Jobs, days=[10,15],shapes=[10, 13], probs=[0.8,0.9]):
   # Testing using test/dev sets from the most recent data and all other data for training set
   testtime=str(pd.Timestamp.now().day)+'_'+str(pd.Timestamp.now().hour)
   testtimestr='test_results'+str(testtime)+'.txt'
   file=open(testtimestr,'w')
   file.write('Test Accuracy, Training Accuracy, days ahead, hidden units, keep prob1, keep prob2')
   file.close()
-  days=[10,12,14]
-  shapes=[10,13,16]
-  probs=[0.8,0.9,1]
   test_results =[]
   test_accuracy=0.6
   for i in days:
-      Curr= Currency(USDCAD,i)
-      Feed, Y, _,_=merge_all()
+      Curr= get_curr(i)
+      Feed, Y, _,_=merge_all(Curr,Bonds,OilN,NetSp,FundsRates, Jobs)
       Xtrain,Ytrain,Xtest,Ytest,Xdev,Ydev=SplitData3way(Feed.values,Y)
       for k in shapes:
           for l in probs:

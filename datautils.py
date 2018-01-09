@@ -1,5 +1,9 @@
-def merge_all(Curr=Curr,Bonds=Bonds,OilN=OilN,NetSp=NetSp,FundsRates=FundsRates, Jobs=Jobs, curtestex=1):
+import pandas as pd
+import numpy as np
 
+def merge_all(Curr,Bonds,OilN,NetSp,FundsRates, Jobs, pred_days=100):
+    Curr.columns=Curr.columns.get_level_values(0)
+    OilN.columns=OilN.columns.get_level_values(0)
     Feedt=pd.merge(Bonds,OilN,how='outer',left_index=True,right_index=True)
     Feedt=pd.merge(Feedt,FundsRates,how='outer',left_index=True,right_index=True)
     Feedt=pd.merge(Feedt,Jobs,how='outer',left_index=True,right_index=True)
@@ -17,7 +21,7 @@ def merge_all(Curr=Curr,Bonds=Bonds,OilN=OilN,NetSp=NetSp,FundsRates=FundsRates,
     Feedt=Feedt.T
     Y=Y.values.reshape(1,Feed.shape[1])
     Ymag=Ymag.values.reshape(1,Feed.shape[1])
-    return Feed, Y, Ymag, Feedt.iloc[:,-curtestex:] #Defaulting using last 220 full examples as predictor input, can be adjusted later
+    return Feed, Y, Ymag, Feedt.iloc[:,-pred_days:] #Defaulting using last 100 full examples as predictor input, can be adjusted later
 
 def SplitData3way(X,Y,percent_train=90):
     #First cut out the recent test and dev sets: all values in training set are prior to values in the test and dev
@@ -39,5 +43,3 @@ def SplitData3way(X,Y,percent_train=90):
     Ydev=np.float32(Y[:,Permutdev])
 #     print(Xtrain, Ytrain, Xtest, Ytest, Xdev)
     return Xtrain, Ytrain, Xtest, Ytest, Xdev, Ydev
-
-

@@ -1,7 +1,11 @@
 import pandas as pd
 import numpy as np
 
+<<<<<<< HEAD
 def merge_all(Curr,Bonds,OilN,NetSp,FundsRates, Jobs, pred_days=100):
+=======
+def merge_all(Curr,Bonds,OilN,NetSp,FundsRates, Jobs, curtestex=1):
+>>>>>>> cb874270fc96c606f0d46d2228cc185ed13918bd
     Curr.columns=Curr.columns.get_level_values(0)
     OilN.columns=OilN.columns.get_level_values(0)
     Feedt=pd.merge(Bonds,OilN,how='outer',left_index=True,right_index=True)

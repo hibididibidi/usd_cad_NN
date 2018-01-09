@@ -1,6 +1,7 @@
 #predictor
 from initit import *
 from tensor_model_funcs import *
+import _pickle as pickle
 
 def Pred(X,parameters):
     W1 = parameters['W1']
@@ -29,13 +30,17 @@ def tester_table(Feed_pred,Yhat):
 
 def run_model(Bonds,OilN,NetSp,FundsRates, Jobs, days=[10,15],shapes=[10, 13], probs=[0.8,0.9]):
   # Testing using test/dev sets from the most recent data and all other data for training set
-  testtime=str(pd.Timestamp.now().day)+'_'+str(pd.Timestamp.now().hour)
+  testtime=str(pd.Timestamp.now().day)+'_'+str(pd.Timestamp.now().hour)+'_'+str(pd.Timestamp.now().minute)
   testtimestr='test_results'+str(testtime)+'.txt'
+  bestparamtime='best_params'+str(testtime)+'.txt'
   file=open(testtimestr,'w')
   file.write('Test Accuracy, Training Accuracy, days ahead, hidden units, keep prob1, keep prob2')
   file.close()
+  file2=open(bestparamtime,'w')
+  file2.write('W1, W2, b1, b2')
+  file2.close()
   test_results =[]
-  test_accuracy=0.6
+  test_accuracy=0.4
   for i in days:
       Curr= get_curr(i)
       Feed, Y, _,_=merge_all(Curr,Bonds,OilN,NetSp,FundsRates, Jobs)
@@ -53,4 +58,7 @@ def run_model(Bonds,OilN,NetSp,FundsRates, Jobs, days=[10,15],shapes=[10, 13], p
                       test_accuracy=Acc
                       best_params=parameters
                       Day_Un_P1_P2=[i,k,l,m]
-  return print('test results',test_results)
+  with open(bestparamtime, "wb") as myFile:
+    pickle.dump(best_params, myFile)
+  print('test results',test_results)
+  return(best_params)

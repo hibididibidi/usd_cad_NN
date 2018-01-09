@@ -7,11 +7,7 @@ def bias_variable(shape):
     initial = tf.constant(0.1, shape=shape)
     return tf.Variable(initial)
 
-<<<<<<< HEAD
 def model_n(X_train, Y_train, X_dev, Y_dev, learning_rate = 0.001, keepprob1 =1, keepprob2=1, num_epochs = 10000, print_cost = True, layers = [4,50,1]):
-=======
-def model_n(X_train, Y_train, X_test, Y_test, X_predict, learning_rate = 0.001, keepprob1 =1, keepprob2=1, num_epochs = 10000, print_cost = True, layers = [4,50,1]):
->>>>>>> cb874270fc96c606f0d46d2228cc185ed13918bd
 
     cost=[]
     layers_dims=layers
@@ -67,13 +63,8 @@ def model_n(X_train, Y_train, X_test, Y_test, X_predict, learning_rate = 0.001, 
 
     #determine accuracy of test set
     print('layers = ', layers, 'cost =', c, 'train accuracy =', train_accuracy)
-<<<<<<< HEAD
     print('test accuracy=', sess.run(accuracy, feed_dict={X:X_dev,Y:Y_dev,keep_prob1:1.0, keep_prob2:1.0}))
     acc=sess.run(accuracy,feed_dict={X:X_dev, Y:Y_dev,keep_prob1:1.0, keep_prob2:1.0})
-=======
-    print('test accuracy=', sess.run(accuracy, feed_dict={X:X_test,Y:Y_test,keep_prob1:1.0, keep_prob2:1.0}))
-    acc=sess.run(accuracy,feed_dict={X:X_test, Y:Y_test,keep_prob1:1.0, keep_prob2:1.0})
->>>>>>> cb874270fc96c606f0d46d2228cc185ed13918bd
     parameters={'W1':sess.run(W1), 'W2': sess.run(W2),'b1':sess.run(b1),'b2':sess.run(b2)}
 #     print('prediction USD will gain in 20d =',sess.run(tf.sigmoid(Z3), feed_dict={X:X_predict, keep_prob:1.0}))
 

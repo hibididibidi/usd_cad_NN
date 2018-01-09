@@ -233,3 +233,5 @@ Feed,Y,Ymag,FT=du.merge_all(Curr,Bonds,OilN,NetSp,FundsRates, Jobs)
 du.SplitData3way(Feed.values,Y)
 
 print('inputs are:',Feed.iloc[:,-5:])
+
+git config --global user.email "thomasgmcarthur@gmail.com"

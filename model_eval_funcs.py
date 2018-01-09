@@ -1,12 +1,7 @@
 #predictor
-<<<<<<< HEAD
 from gather_train import *
 from tensor_model_funcs import *
 import _pickle as pickle
-=======
-from initit import *
-from tensor_model_funcs import *
->>>>>>> cb874270fc96c606f0d46d2228cc185ed13918bd
 
 def Pred(X,parameters):
     W1 = parameters['W1']
@@ -33,11 +28,7 @@ def tester_table(Feed_pred,Yhat):
     Z.columns=[['Probability','Current']]
     return Z
 
-<<<<<<< HEAD
 def train_model(Bonds,OilN,NetSp,FundsRates, Jobs, days=[10,15],shapes=[10, 13], probs=[0.8,0.9]):
-=======
-def run_model(Bonds,OilN,NetSp,FundsRates, Jobs, days=[10,15],shapes=[10, 13], probs=[0.8,0.9]):
->>>>>>> cb874270fc96c606f0d46d2228cc185ed13918bd
   # Testing using test/dev sets from the most recent data and all other data for training set
   testtime=str(pd.Timestamp.now().day)+'_'+str(pd.Timestamp.now().hour)+'_'+str(pd.Timestamp.now().minute)
   testtimestr='test_results'+str(testtime)+'.txt'

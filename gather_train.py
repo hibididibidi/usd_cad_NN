@@ -13,7 +13,9 @@ from model_eval_funcs import *
 
 Bonds, OilN, NetSp, FundsRates, Jobs=get_data()
 Curr=get_curr()
-Feed, Y, Ymag, Feedt=merge_all(Curr, Bonds, OilN, NetSp, FundsRates, Jobs)
+Feed, Y, Ymag, Feed_pred=merge_all(Curr, Bonds, OilN, NetSp, FundsRates, Jobs, 200)
 Xtrain, Ytrain, Xtest, Ytest, Xdev, Ydev= SplitData3way(Feed.values,Y)
-
-print('inputs are:',Feed.iloc[:,-5:])
+print('inputs are:',Feed.iloc[:,-1])
+ask=input('run train_model with default parameters? y/n ')
+if ask == 'y':
+    best_params=train_model(Bonds,OilN,NetSp,FundsRates, Jobs, days=[10],shapes=[13], probs=[.95])

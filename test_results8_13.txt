@@ -1,1 +1,0 @@
-Test Accuracy, Training Accuracy, days ahead, hidden units, keep prob1, keep prob2

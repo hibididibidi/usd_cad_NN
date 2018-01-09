@@ -106,6 +106,6 @@ def Quantify_returns(params,Feed_pred,Days=100):
     return
 
 def Load_params(filename):
-    with open("mySavedDict.txt", "rb") as myFile:
+    with open(filename, "rb") as myFile:
         params = pickle.load(myFile)
     return params

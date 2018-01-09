@@ -7,8 +7,8 @@ def bias_variable(shape):
     initial = tf.constant(0.1, shape=shape)
     return tf.Variable(initial)
 
-def model_n(X_train, Y_train, X_dev, Y_dev, learning_rate = 0.001, keepprob1 =1, keepprob2=1, num_epochs = 10000, print_cost = True, layers = [4,50,1]):
 
+def model_n(X_train, Y_train, X_dev, Y_dev, learning_rate = 0.001, keepprob1 =1, keepprob2=1, num_epochs = 10000, print_cost = True, layers = [4,50,1]):
     cost=[]
     layers_dims=layers
     parameters={}

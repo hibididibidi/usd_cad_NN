@@ -44,10 +44,10 @@ def get_data(daysahead=20):
 	CPI.columns=['CPI']
 
 	#Cad Bonds
-	CADBOC= pd.read_csv('CanBonds.csv',skiprows=4, index_col=['Rates'],skipfooter=7).convert_objects(convert_numeric=True)# CANSIM table 176-0043
+	CADBOC= pd.read_csv('C1.csv',skiprows=4, index_col=['Rates'],skipfooter=7).convert_objects(convert_numeric=True)# CANSIM table 176-0043 CanBonds
 
 	#BoC overnight rates
-	BOCON= pd.read_csv('BoCOvernight.csv',skiprows=2, index_col=['Daily'])#CANSIM table 176-0048
+	BOCON= pd.read_csv('C2.csv',skiprows=2, index_col=['Daily'])#CANSIM table 176-0048
 	BOCON.columns=['BOC fundrate']
 	BOCON.dropna(inplace=True)
 
@@ -56,13 +56,13 @@ def get_data(daysahead=20):
 	USUnEm.columns=['Unemployment rate US']
 	USNonFarm=quandl.get("BLSE/CES0000000001", authtoken="mmpvRYssGGBNky867tt5",start_date='1955-06-01')
 	USNonFarm.columns=['1000s employed US']
-	employmentsituationdate=pd.DataFrame(pd.read_excel('EmploySitUS.xls',skiprows=35).iloc[:,0])
+	employmentsituationdate=pd.DataFrame(pd.read_excel('EmploySitUS.xlsx',skiprows=35).iloc[:,0])
 	employmentsituationdate.columns=['date']
 	rest=pd.merge(USUnEm, employmentsituationdate,left_index=True, right_on='date',how='outer')
 	rest=rest.set_index('date')
 	rest.sort_index(level=0)
 	rest=pd.merge(rest, USNonFarm,left_index=True, right_index=True,how='outer')
-	rest['released']=rest['Unemployment rate US'].shift(2)
+	rest['Uunemploy']=rest['Unemployment rate US'].shift(2)
 	rest.fillna(method='pad',inplace=True)
 	rest.tail(10)
 	emp=pd.merge(employmentsituationdate,rest,left_on='date',right_index=True)
@@ -71,7 +71,7 @@ def get_data(daysahead=20):
 
 
 
-	CanEm=pd.read_csv('CanEmploy.csv',skiprows=3, index_col=['Data type']) #Cansim table 282-0087
+	CanEm=pd.read_csv('C3.csv',skiprows=3, index_col=['Data type']) #Cansim table 282-0087
 	CanEm=CanEm.iloc[0:3,5:].T['Seasonally adjusted']
 	CanEm.columns=[['1000s employed Can','Unemployment rate Can']]
 	CanEm1=CanEm.shift()
@@ -82,6 +82,15 @@ def get_data(daysahead=20):
 	CanEmS['gainrateemp']=(CanEmS['C1000s employed shift1'].values -CanEmS['C1000s employed shift2'].values)/CanEmS['C1000s employed shift2']*100
 	CanEmS['gainrateunem']=CanEmS['CUnemploy rate shift1'].values-CanEmS['CUnemploy rate shift2'].values
 	CanEmS.index=pd.to_datetime(CanEmS.index)
+	CanDate=list(CanEmS.index)
+	for i in range(len(CanDate)):
+		if CanDate[i].weekday()==4:
+			pass
+		elif CanDate[i].weekday()<4:
+			CanDate[i]=CanDate[i]+pd.Timedelta(str(4-CanDate[i].weekday())+' days')
+		else:
+			CanDate[i]=CanDate[i]+pd.Timedelta(str(4-CanDate[i].weekday()+7)+' days')
+	CanEmS.index=pd.DatetimeIndex(CanDate)
 	CanEmSF=CanEmS[['CUnemploy rate shift1','CUnemploy rate shift2','gainrateemp','gainrateunem']]
 	# CanEmS.index.values=CanEmS.index.values.apply(lambda x: x.replace(day=1) )
 
@@ -166,7 +175,7 @@ def get_data(daysahead=20):
 	return Bonds, OilN, NetSp, FundsRates, Jobs
 
 def get_curr(daysahead=20):
-	Currt= quandl.get("FED/RXI_N_B_CA", authtoken="mmpvRYssGGBNky867tt5") 
+	Currt= quandl.get("FED/RXI_N_B_CA", authtoken="mmpvRYssGGBNky867tt5")
 	Currt['Plus1']=Currt['Value'].shift(periods=-daysahead) # THIS IS THE 20 DAY AHEAD PRICE
 	Currt['Minus1']=(Currt['Value'].shift(periods=1)-Currt['Value'])*100
 	# Utest['Minus5']=(Currt['Value'].shift(periods=5)-Currt['Value'])*100

@@ -97,15 +97,50 @@ def evaluate_predictor(TT, thresh=0.3):
     print('1$CAD or ',1/conversionexchange[0],'USD is:','Value in CAD =',ValueCAD[-1],'Value in USD =', ValueUSD[-1])#, 'in', np.timedelta64((TT1.index.values[-1]-TT1.index.values[0]),'D'))
     return (round(float(ValueCAD[-1]),4))
 
-def Quantify_returns(params,Feed_pred,Days=100):
+def Quantify_returns(params,Feed_pred,Tau=0.35,Days=100):
     # _,_,_,Feed_pred= merge_all(curtestex=Days)
     Yhat=Pred(Feed_pred.astype('float32'),params)
     TT=tester_table(Feed_pred,Yhat)
 #     print(TT.iloc[50:120])
-    evaluate_predictor(TT, 0.5)
-    return
+    R=evaluate_predictor(TT, Tau)
+    return R
 
 def Load_params(filename):
-    with open("mySavedDict.txt", "rb") as myFile:
+    with open(filename, "rb") as myFile:
         params = pickle.load(myFile)
     return params
+
+def train_test_model(Bonds,OilN,NetSp,FundsRates, Jobs, days=[10,15],shapes=[10, 13], probs=[0.8,0.9]):
+  # Testing using test/dev sets from the most recent data and all other data for training set
+  testtime=str(pd.Timestamp.now().day)+'_'+str(pd.Timestamp.now().hour)+'_'+str(pd.Timestamp.now().minute)
+  testtimestr='test_results'+str(testtime)+'.txt'
+  bestparamtime='best_params'+str(testtime)+'.txt'
+  file=open(testtimestr,'w')
+  file.write('Test Accuracy, Training Accuracy, days ahead, hidden units, keep prob1, keep prob2')
+  file.close()
+  test_results =[]
+  R=[]
+  test_accuracy=0.4
+  for i in days:
+      Curr= get_curr(i)
+      Feed, Y, _,Feed_pred=merge_all(Curr,Bonds,OilN,NetSp,FundsRates, Jobs, 200)
+      Xtrain,Ytrain,Xtest,Ytest,Xdev,Ydev=SplitData3way(Feed.values,Y)
+      for k in shapes:
+          for l in probs:
+              for m in probs:
+                  parameters,Acc,Train=model_n(Xtrain,Ytrain,Xdev,Ydev, num_epochs=10001, layers=[Xtrain.shape[0], k, 1], learning_rate=0.001, keepprob1=l, keepprob2=m)
+                  print(i,'days ahead,', l, 'prob1,', m, 'prob2')
+                  test_results.append((Acc,Train))
+                  file=open(testtimestr,'a')
+                  file.write('\n'+str(Acc)+','+str(Train)+','+str(i)+','+str(k)+','+str(l)+','+str(m))
+                  file.close()
+                  R.append(Quantify_returns(parameters, Feed_pred))
+                  if Acc>test_accuracy and Acc<Train:
+                      test_accuracy=Acc
+                      best_params=parameters
+                      Day_Un_P1_P2=[i,k,l,m]
+  with open(bestparamtime, "wb") as myFile:
+    pickle.dump(best_params, myFile)
+  print('test results',test_results)
+  print(R)
+  return(best_params)

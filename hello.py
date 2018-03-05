@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import quandl
 
+str(pd.Timestamp.now())[:-10].replace(' ','_')
 # import data
 USDCAD= quandl.get("FED/RXI_N_B_CA", authtoken="mmpvRYssGGBNky867tt5")
 
@@ -227,9 +228,65 @@ Ytest=np.float32(Y[:,Permuttest])
 Xdev=np.float32(X[:,Permutdev])
 Ydev=np.float32(Y[:,Permutdev])
 
-Curr, Bonds, OilN, NetSp, FundsRates, Jobs=gd.get_data()
+Bonds, OilN, NetSp, FundsRates, Jobs=gd.get_data()
+Jobs['released']
+
 import datautils as du
 Feed,Y,Ymag,FT=du.merge_all(Curr,Bonds,OilN,NetSp,FundsRates, Jobs)
 du.SplitData3way(Feed.values,Y)
 
 print('inputs are:',Feed.iloc[:,-5:])
+
+CanEm=pd.read_csv('C3.csv',skiprows=3, index_col=['Data type']) #Cansim table 282-0087
+CanEm=CanEm.iloc[0:3,5:].T['Seasonally adjusted']
+CanEm.columns=[['1000s employed Can','Unemployment rate Can']]
+CanEm1=CanEm.shift()
+CanEm1.columns=[['C1000s employed shift1','CUnemploy rate shift1']]
+CanEm2=CanEm.shift(2)
+CanEm2.columns=[['C1000s employed shift2','CUnemploy rate shift2']]
+CanEmS=pd.merge(CanEm1,CanEm2, left_index=True,right_index=True)
+CanEmS['gainrateemp']=(CanEmS['C1000s employed shift1'].values -CanEmS['C1000s employed shift2'].values)/CanEmS['C1000s employed shift2']*100
+CanEmS['gainrateunem']=CanEmS['CUnemploy rate shift1'].values-CanEmS['CUnemploy rate shift2'].values
+CanEmS.index=pd.to_datetime(CanEmS.index)
+CanEmSF=CanEmS[['CUnemploy rate shift1','CUnemploy rate shift2','gainrateemp','gainrateunem']]
+
+CanDate=map(lambda x:pd.Timedelta('7 days')+x, CanEmS.index.values)
+CanDate=list(CanDate)
+# CanDate=list(map(lambda x: CanDate
+# CanDate[0].weekday()
+for i in range(len(CanDate)):
+	if CanDate[i].weekday()==4:
+		pass
+	elif CanDate[i].weekday()<4:
+		CanDate[i]=CanDate[i]+pd.Timedelta(str(4-CanDate[i].weekday())+' days')
+	else:
+		CanDate[i]=CanDate[i]+pd.Timedelta(str(4-CanDate[i].weekday()+7)+' days')
+CanEmSF.index=pd.DatetimeIndex(CanDate)
+CanEm.head(10)
+CanEmSF.head()
+
+USUnEm=quandl.get("FRED/UNRATE", authtoken="mmpvRYssGGBNky867tt5",start_date='1955-06-01')
+USUnEm.columns=['Unemployment rate US']
+USNonFarm=quandl.get("BLSE/CES0000000001", authtoken="mmpvRYssGGBNky867tt5",start_date='1955-06-01')
+USNonFarm.columns=['1000s employed US']
+employmentsituationdate=pd.DataFrame(pd.read_excel('EmploySitUS.xls',skiprows=35).iloc[:,0])
+employmentsituationdate.columns=['date']
+rest=pd.merge(USUnEm, employmentsituationdate,left_index=True, right_on='date',how='outer')
+rest=rest.set_index('date')
+rest.sort_index(level=0)
+rest=pd.merge(rest, USNonFarm,left_index=True, right_index=True,how='outer')
+rest['released']=rest['Unemployment rate US'].shift(2)
+rest.fillna(method='pad',inplace=True)
+rest.tail(10)
+emp=pd.merge(employmentsituationdate,rest,left_on='date',right_index=True)
+emp.drop(['Unemployment rate US'],axis=1, inplace=True)
+emp=emp.set_index('date')
+emp.tail()
+USNonFarm.tail()
+
+import get_data as gd
+Bonds,OilN,NetSp,FundsRates, Jobs= gd.get_data()
+Curr=gd.get_curr()
+import datautils as du
+Feed, y, ymag, Feed_pred=du.merge_all(Curr,Bonds,OilN,NetSp,FundsRates, Jobs)
+Feed

@@ -17,8 +17,8 @@ def get_data(daysahead=20):
 	USyields = quandl.get("USTREASURY/YIELD", authtoken="mmpvRYssGGBNky867tt5")
 
 	#net cad long/short spec and non-speculative positions
-	NetCAD=quandl.get("CFTC/CD_F_L_ALL", authtoken="mmpvRYssGGBNky867tt5")
-
+	NetCAD=quandl.get("CFTC/090741_F_L_ALL")
+	
 	#oil prices futures weekly - Calculate backwardation/contango
 	Oil4 = quandl.get("EIA/PET_RCLC4_W", authtoken="mmpvRYssGGBNky867tt5")
 	Oil4.columns=['Oil4']

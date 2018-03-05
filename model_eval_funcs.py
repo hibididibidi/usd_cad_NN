@@ -30,7 +30,7 @@ def tester_table(Feed_pred,Yhat):
 
 def train_model(Bonds,OilN,NetSp,FundsRates, Jobs, days=[10,15],shapes=[10, 13], probs=[0.8,0.9]):
   # Testing using test/dev sets from the most recent data and all other data for training set
-  testtime=str(pd.Timestamp.now().day)+'_'+str(pd.Timestamp.now().hour)+'_'+str(pd.Timestamp.now().minute)
+  testtime=str(pd.Timestamp.now())[:-10].replace(' ','_')
   testtimestr='test_results'+str(testtime)+'.txt'
   bestparamtime='best_params'+str(testtime)+'.txt'
   file=open(testtimestr,'w')
@@ -94,7 +94,7 @@ def evaluate_predictor(TT, thresh=0.3):
             ValueUSD.append(ValueCAD[-1]/conversionexchange[i])
     # if startpos[-1]==1:
     # print(ValueCAD,ValueUSD)
-    print('1$CAD or ',1/conversionexchange[0],'USD is:','Value in CAD =',ValueCAD[-1],'Value in USD =', ValueUSD[-1])#, 'in', np.timedelta64((TT1.index.values[-1]-TT1.index.values[0]),'D'))
+    print('1$CAD or ',1/conversionexchange[0],'USD is:','Value in CAD =',ValueCAD[-1],'Value in USD =', ValueUSD[-1], 'MOST RECENT PROB', TT['Probability'].iloc[-1].values[0])#, 'in', np.timedelta64((TT1.index.values[-1]-TT1.index.values[0]),'D'))
     return (round(float(ValueCAD[-1]),4))
 
 def Quantify_returns(params,Feed_pred,Tau=0.35,Days=100):

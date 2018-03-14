@@ -43,3 +43,32 @@ def SplitData3way(X,Y,percent_train=90):
     Ydev=np.float32(Y[:,Permutdev])
 #     print(Xtrain, Ytrain, Xtest, Ytest, Xdev)
     return Xtrain, Ytrain, Xtest, Ytest, Xdev, Ydev
+
+def merge_all_DB(Curr,Bonds,OilN,NetSp,FundsRates, Jobs, pred_days=100):
+    Curr.columns=Curr.columns.get_level_values(0)
+    OilN.columns=OilN.columns.get_level_values(0)
+    Feedt=pd.merge(Bonds,OilN,how='outer',left_index=True,right_index=True)
+    Feedt=pd.merge(Feedt,FundsRates,how='outer',left_index=True,right_index=True)
+    Feedt=pd.merge(Feedt,Jobs,how='outer',left_index=True,right_index=True)
+    Feedt['NetSp']=NetSp
+    Feedt.fillna(method='pad',inplace=True)
+    Feedt=pd.merge(Curr,Feedt,how='outer',left_index=True,right_index=True)
+    Feed=Feedt.copy()
+    Feed.dropna(inplace=True) #this will drop all current prices too if the data has not been updated
+    return Feed
+
+def SplitData3waysequential(X,Y,percent_train=90, percent_dev=5):
+    #First cut out the recent test and dev sets: all values in training set are prior to values in the test and dev
+    ntrain=int(percent_train/100*X.shape[1])
+    Xtrain=np.float32(X[:,:ntrain])
+    Ytrain=np.float32(Y[:,:ntrain])
+    m=X.shape[1]
+#     X=(X-X.mean(axis=1).reshape(-1,1))/X.std(axis=1).reshape(-1,1) ###### Batch normalization did not seem to have any effect
+
+    ntest=int((percent_dev+percent_train)/100*X.shape[1])
+    Xtest=np.float32(X[:,ntrain:ntest])
+    Ytest=np.float32(Y[:,ntrain:ntest])
+    Xdev=np.float32(X[:,ntest:])
+    Ydev=np.float32(Y[:,ntest:])
+#     print(Xtrain, Ytrain, Xtest, Ytest, Xdev)
+    return Xtrain, Ytrain, Xtest, Ytest, Xdev, Ydev

@@ -1,2 +1,0 @@
-Test Accuracy, Training Accuracy, days ahead, hidden units, keep prob1, keep prob2
-0.5294118,0.73312825,10,13,0.95,0.95

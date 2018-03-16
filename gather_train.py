@@ -2,12 +2,13 @@ import numpy as np
 import pandas as pd
 import quandl
 # import tensorflow as tf
+#cd /Users/Thomas/github/usd_cad_NN/
+
 import requests
 from get_data import *
 # cd C:\Users\thoma\github\usd_cad_NN/
 # %matplotlib inline
 from datautils import *
-from get_data import *
 from model_eval_funcs import *
 
 

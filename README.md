@@ -38,3 +38,6 @@ This will then prompt you to train the NN with default drop out, hidden units, d
 
 To test the profitability of the model, the function Quantify_returns can be run which takes the most recent X number of days (100 as default) and starts with 1$CAD and converts it back and forth to USD when the model so dictates.
 
+#IN PROGRESS/FUTURE TESTING
+- Testing benefits of using various RNN Architectures
+

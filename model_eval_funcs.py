@@ -1,7 +1,9 @@
 #predictor
-from gather_train import *
+# from gather_train import *
 from tensor_model_funcs import *
 import _pickle as pickle
+import pandas as pd
+import numpy as np
 
 def Pred(X,parameters):
     W1 = parameters['W1']
@@ -100,6 +102,14 @@ def evaluate_predictor(TT, thresh=0.3):
 def Quantify_returns(params,Feed_pred,Tau=0.35,Days=100):
     # _,_,_,Feed_pred= merge_all(curtestex=Days)
     Yhat=Pred(Feed_pred.astype('float32'),params)
+    TT=tester_table(Feed_pred,Yhat)
+#     print(TT.iloc[50:120])
+    R=evaluate_predictor(TT, Tau)
+    return R
+
+def Quantify_returns_keras(Feed_pred, Yhat,Tau=0.35,Days=192):
+    # _,_,_,Feed_pred= merge_all(curtestex=Days)
+
     TT=tester_table(Feed_pred,Yhat)
 #     print(TT.iloc[50:120])
     R=evaluate_predictor(TT, Tau)

@@ -66,9 +66,9 @@ def SplitData3waysequential(X,Y,percent_train=90, percent_dev=5):
 #     X=(X-X.mean(axis=1).reshape(-1,1))/X.std(axis=1).reshape(-1,1) ###### Batch normalization did not seem to have any effect
 
     ntest=int((percent_dev+percent_train)/100*X.shape[1])
-    Xtest=np.float32(X[:,ntrain:ntest])
-    Ytest=np.float32(Y[:,ntrain:ntest])
-    Xdev=np.float32(X[:,ntest:])
-    Ydev=np.float32(Y[:,ntest:])
+    Xtest=np.float32(X[:,ntrain:])##NOTe THIS INCLUDES THE DEV SET
+    Ytest=np.float32(Y[:,ntrain:])##NOTe THIS INCLUDES THE DEV SET
+    Xdev=0#np.float32(X[:,ntest:]) #Change this if dev set is desired
+    Ydev=0#np.float32(Y[:,ntest:]) #Change this if dev set is desired
 #     print(Xtrain, Ytrain, Xtest, Ytest, Xdev)
     return Xtrain, Ytrain, Xtest, Ytest, Xdev, Ydev
